@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-rose-deep: #893941;
+  --color-brand-rose-mid: #CB7885;
+  --color-brand-rose-light: #EFD7CF;
+  --color-brand-rose-blush: #DDBAAE;
+  --color-brand-green-sage: #818263;
+  --color-brand-green-olive: #5E6623;
+  --color-brand-cream: #FFFAF2;
+  --color-brand-cream-honey: #F6EAD4;
+  --color-brand-cream-latte: #DCD4C1;
+  
+  --font-serif: "Poppins", sans-serif;
+  --font-sans: "Poppins", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-cream text-neutral-800 font-sans antialiased selection:bg-brand-rose-light selection:text-brand-rose-deep;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FFFAF2;
+}
+::-webkit-scrollbar-thumb {
+  background: #DCD4C1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #CB7885;
+}
+
+/* Soft transition effects */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}

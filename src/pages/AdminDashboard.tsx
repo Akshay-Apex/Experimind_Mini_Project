@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useStore, type Product } from '../context/StoreContext';
-import { GALLERY_IMAGES } from '../assets/gallery';
+import { GALLERY_ENTRIES } from '../assets/gallery';
 import { Edit, Trash2, Plus, LogOut, Check, X, ShieldAlert, ShoppingBag, Settings, LayoutGrid, Eye, EyeOff } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -443,16 +443,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
                     <div>
                       <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-2">Select Design Image</label>
                       <div className="grid grid-cols-5 md:grid-cols-7 gap-2 max-h-36 overflow-y-auto border border-brand-cream-latte rounded-xl p-2.5 bg-brand-cream">
-                        {GALLERY_IMAGES.map((imgUrl, index) => (
+                        {GALLERY_ENTRIES.map((entry, index) => (
                           <button
                             key={index}
                             type="button"
-                            onClick={() => setNewProdImage(imgUrl)}
+                            onClick={() => setNewProdImage(entry.src)}
                             className={`cursor-pointer aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                              newProdImage === imgUrl ? 'border-brand-rose-deep scale-95 ring-1 ring-brand-rose-deep' : 'border-transparent opacity-60 hover:opacity-100'
+                              newProdImage === entry.src ? 'border-brand-rose-deep scale-95 ring-1 ring-brand-rose-deep' : 'border-transparent opacity-60 hover:opacity-100'
                             }`}
+                            title={entry.name}
                           >
-                            <img src={imgUrl} className="w-full h-full object-cover" alt="Local design asset" />
+                            <img src={entry.src} className="w-full h-full object-cover" alt={entry.name} />
                           </button>
                         ))}
                       </div>
@@ -551,16 +552,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
                     <div>
                       <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-2">Select Design Image</label>
                       <div className="grid grid-cols-5 md:grid-cols-7 gap-2 max-h-36 overflow-y-auto border border-brand-cream-latte rounded-xl p-2.5 bg-brand-cream">
-                        {GALLERY_IMAGES.map((imgUrl, index) => (
+                        {GALLERY_ENTRIES.map((entry, index) => (
                           <button
                             key={index}
                             type="button"
-                            onClick={() => setEditingProduct({ ...editingProduct, image: imgUrl })}
+                            onClick={() => setEditingProduct({ ...editingProduct, image: entry.src })}
                             className={`cursor-pointer aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                              editingProduct.image === imgUrl ? 'border-brand-rose-deep scale-95 ring-1 ring-brand-rose-deep' : 'border-transparent opacity-60 hover:opacity-100'
+                              editingProduct.image === entry.src ? 'border-brand-rose-deep scale-95 ring-1 ring-brand-rose-deep' : 'border-transparent opacity-60 hover:opacity-100'
                             }`}
+                            title={entry.name}
                           >
-                            <img src={imgUrl} className="w-full h-full object-cover" alt="Local design asset" />
+                            <img src={entry.src} className="w-full h-full object-cover" alt={entry.name} />
                           </button>
                         ))}
                       </div>

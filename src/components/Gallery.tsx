@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { GALLERY_IMAGES, getFriendlyName } from '../assets/gallery';
+import { GALLERY_ENTRIES, type GalleryEntry } from '../assets/gallery';
 import { useStore } from '../context/StoreContext';
 import { X, Send, Eye, Sparkles, Check } from 'lucide-react';
 
 export const Gallery: React.FC = () => {
   const { settings, addOrder } = useStore();
-  const [selectedImg, setSelectedImg] = useState<string | null>(null);
+  const [selectedEntry, setSelectedEntry] = useState<GalleryEntry | null>(null);
   
   // Direct booking state
   const [isBooking, setIsBooking] = useState(false);
@@ -18,8 +18,8 @@ export const Gallery: React.FC = () => {
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [validationErr, setValidationErr] = useState('');
 
-  const handleOpenLightbox = (imgUrl: string) => {
-    setSelectedImg(imgUrl);
+  const handleOpenLightbox = (entry: GalleryEntry) => {
+    setSelectedEntry(entry);
     setIsBooking(false);
     setName('');
     setPhone('');
@@ -56,7 +56,7 @@ export const Gallery: React.FC = () => {
     const finalPrice = basePrice + sizeAddon;
     const grandTotal = finalPrice + settings.shippingFee;
     
-    const friendlyName = selectedImg ? getFriendlyName(selectedImg) : 'Handmade Bouquet';
+    const friendlyName = selectedEntry ? selectedEntry.name : 'Handmade Bouquet';
     const designLabel = `Gallery Design: ${friendlyName}`;
 
     // Add Order to context logger
@@ -105,7 +105,7 @@ _Please send payment details for GPay / PhonePe. I am confirming this booking di
     setTimeout(() => {
       // Redirect to WhatsApp
       window.open(targetWaUrl, '_blank');
-      setSelectedImg(null);
+      setSelectedEntry(null);
     }, 1200);
   };
 
@@ -125,18 +125,16 @@ _Please send payment details for GPay / PhonePe. I am confirming this booking di
 
         {/* Simplistic Image Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {GALLERY_IMAGES.map((imgUrl, index) => {
-            const friendlyName = getFriendlyName(imgUrl);
-            return (
+          {GALLERY_ENTRIES.map((entry, index) => (
               <div
                 key={index}
-                onClick={() => handleOpenLightbox(imgUrl)}
+                onClick={() => handleOpenLightbox(entry)}
                 className="group relative cursor-pointer overflow-hidden rounded-2xl border border-brand-cream-latte/50 bg-brand-cream shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
               >
                 <div className="aspect-square w-full overflow-hidden bg-brand-cream-honey/10">
                   <img
-                    src={imgUrl}
-                    alt={friendlyName}
+                    src={entry.src}
+                    alt={entry.name}
                     className="h-full w-full object-cover transform group-hover:scale-102 transition-transform duration-500"
                   />
                 </div>
@@ -151,19 +149,18 @@ _Please send payment details for GPay / PhonePe. I am confirming this booking di
                 
                 <div className="p-3.5 bg-brand-cream text-center">
                   <p className="text-xs font-semibold text-neutral-700 truncate">
-                    Design #{friendlyName.split('_')[0] || friendlyName}
+                    {entry.name}
                   </p>
                 </div>
               </div>
-            );
-          })}
+            ))}
         </div>
 
         {/* Lightbox / Booking Modal */}
-        {selectedImg && (
+        {selectedEntry && (
           <div className="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
             {/* Backdrop */}
-            <div className="fixed inset-0 bg-neutral-900/60 backdrop-blur-sm" onClick={() => setSelectedImg(null)} />
+            <div className="fixed inset-0 bg-neutral-900/60 backdrop-blur-sm" onClick={() => setSelectedEntry(null)} />
 
             {/* Modal Box */}
             <div className="flex min-h-screen items-center justify-center p-4">
@@ -171,7 +168,7 @@ _Please send payment details for GPay / PhonePe. I am confirming this booking di
                 
                 {/* Close Button */}
                 <button
-                  onClick={() => setSelectedImg(null)}
+                  onClick={() => setSelectedEntry(null)}
                   className="absolute right-4.5 top-4.5 rounded-full p-2 text-neutral-500 hover:bg-brand-cream-honey hover:text-brand-rose-deep z-20 outline-none"
                 >
                   <X className="h-5.5 w-5.5" />
@@ -181,8 +178,8 @@ _Please send payment details for GPay / PhonePe. I am confirming this booking di
                 <div className="space-y-4">
                   <div className="aspect-square rounded-2xl overflow-hidden border border-brand-cream-latte/60 shadow-inner">
                     <img
-                      src={selectedImg}
-                      alt="Selected flower design"
+                      src={selectedEntry.src}
+                      alt={selectedEntry.name}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -191,7 +188,7 @@ _Please send payment details for GPay / PhonePe. I am confirming this booking di
                       Everlasting Design
                     </span>
                     <h3 className="font-serif text-xl font-bold text-neutral-900 mt-2.5">
-                      Design Reference: {getFriendlyName(selectedImg)}
+                      {selectedEntry.name}
                     </h3>
                     <p className="text-xs text-neutral-500 mt-1 leading-relaxed">
                       Every piece is handmade by Ayesha Amra using premium materials. Colors, fillers, and sizes can be adjusted during booking.

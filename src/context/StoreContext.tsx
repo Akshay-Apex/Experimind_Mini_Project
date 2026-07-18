@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { GALLERY_IMAGES } from '../assets/gallery';
+import { GALLERY_ENTRIES } from '../assets/gallery';
 
 
 export interface Product {
@@ -78,7 +78,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     category: 'Handmade Bouquets',
     price: 1299,
     description: 'An elegant arrangement combining soft pink pipe cleaner roses and pastel tulips, wrapped in premium dual-tone floral mesh. Perfect for anniversaries and expressions of affection.',
-    image: GALLERY_IMAGES[0] || 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&q=80&w=600',
+    image: GALLERY_ENTRIES[0].src,
     inStock: true,
     varieties: ['Roses', 'Tulips', 'Baby\'s Breath']
   },
@@ -88,7 +88,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     category: 'Single Flowers',
     price: 349,
     description: 'A radiant, single-stem pipe cleaner sunflower crafted with meticulous detail. Features a textured dark brown center and vibrant golden petals, designed to brighten any space indefinitely.',
-    image: GALLERY_IMAGES[1] || 'https://images.unsplash.com/photo-1597848212624-a19eb35e2651?auto=format&fit=crop&q=80&w=600',
+    image: GALLERY_ENTRIES[1].src,
     inStock: true,
     varieties: ['Sunflowers']
   },
@@ -98,7 +98,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     category: 'Bridal Bouquets',
     price: 2499,
     description: 'A stunning, high-density bridal bouquet featuring pristine white calla lilies and orchids, embellished with delicate pearl studs. Hand-wrapped with soft satin ribbon.',
-    image: GALLERY_IMAGES[2] || 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600',
+    image: GALLERY_ENTRIES[2].src,
     inStock: true,
     varieties: ['Lilies', 'Orchids', 'Baby\'s Breath']
   },
@@ -108,7 +108,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     category: 'Flower Baskets',
     price: 1599,
     description: 'A rustic woven wicker basket spilling over with colorful Canterbury bells, gerbera daisies, and lavender sprigs. Includes a lovely matching bow detail on the handle.',
-    image: GALLERY_IMAGES[3] || 'https://images.unsplash.com/photo-1589244159943-460088ed5c92?auto=format&fit=crop&q=80&w=600',
+    image: GALLERY_ENTRIES[3].src,
     inStock: true,
     varieties: ['Canterbury Bells', 'Gerbera Daisies', 'Lavender']
   },
@@ -118,7 +118,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     category: 'Floral Lamps',
     price: 1899,
     description: 'A hand-crafted tabletop floral lamp featuring a glass dome container, illuminating a gorgeous trio of red pipe cleaner roses entwined with micro fairy lights. USB powered.',
-    image: GALLERY_IMAGES[4] || 'https://images.unsplash.com/photo-1517999144091-3d9dca6d1e43?auto=format&fit=crop&q=80&w=600',
+    image: GALLERY_ENTRIES[4].src,
     inStock: true,
     varieties: ['Roses']
   },
@@ -128,7 +128,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     category: 'Custom Floral Arrangements',
     price: 1999,
     description: 'A bespoke selection of hydrangeas, lotus, and baby\'s breath arranged elegantly in a ceramic vase. Customizable in color theme and size to match your interior design.',
-    image: GALLERY_IMAGES[5] || 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&q=80&w=600',
+    image: GALLERY_ENTRIES[5].src,
     inStock: true,
     varieties: ['Hydrangeas', 'Lotus', 'Baby\'s Breath']
   },
@@ -138,7 +138,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     category: 'Personalized Gift Sets',
     price: 1499,
     description: 'A beautifully curated gift hamper containing a bundle of aromatic lavender stems, a box of luxury chocolates, and a premium hand-written card styled to your requirements.',
-    image: GALLERY_IMAGES[6] || 'https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&q=80&w=600',
+    image: GALLERY_ENTRIES[6].src,
     inStock: true,
     varieties: ['Lavender', 'Baby\'s Breath']
   },
@@ -148,7 +148,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     category: 'Plushie Add-ons',
     price: 899,
     description: 'A charming plush teddy bear holding a hand-crafted bright red pipe cleaner tulip. An endearing gift option that is perfect for birthdays, graduations, or just because.',
-    image: GALLERY_IMAGES[7] || 'https://images.unsplash.com/photo-1559251606-c623743a6d76?auto=format&fit=crop&q=80&w=600',
+    image: GALLERY_ENTRIES[7].src,
     inStock: true,
     varieties: ['Tulips']
   }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useStore } from '../context/StoreContext';
 import { X, Trash2, ShieldAlert, ShoppingBag, Plus, Minus, Send, Check } from 'lucide-react';
 
@@ -18,6 +18,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
   const [validationErr, setValidationErr] = useState('');
   const [success, setSuccess] = useState(false);
+
+  const checkoutRef = useRef<HTMLDivElement>(null);
 
   if (!isOpen) return null;
 
@@ -41,6 +43,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const handleCheckout = () => {
     if (!name || !phone || !address || !pincode) {
       setValidationErr('All checkout fields are required.');
+      // Scroll to the checkout form so user can see the error and fields
+      checkoutRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
     setValidationErr('');
@@ -105,10 +109,16 @@ _Please send payment details for GPay / PhonePe. I am placing this order directl
     const encodedText = encodeURIComponent(message);
     const targetWaUrl = `https://wa.me/${settings.whatsAppNumber.replace(/[^0-9]/g, '')}?text=${encodedText}`;
 
+    // Open WhatsApp immediately (avoids popup blocker issues with setTimeout)
+    const waWindow = window.open(targetWaUrl, '_blank');
+
+    // If popup was blocked, fall back to location redirect
+    if (!waWindow) {
+      window.location.href = targetWaUrl;
+    }
+
+    // Clear local states after a short delay for UI feedback
     setTimeout(() => {
-      // Open WhatsApp tab
-      window.open(targetWaUrl, '_blank');
-      // Clear local states
       setSuccess(false);
       clearCart();
       setName('');
@@ -231,7 +241,7 @@ _Please send payment details for GPay / PhonePe. I am placing this order directl
                 })}
 
                 {/* Checkout form segment */}
-                <div className="border-t border-brand-cream-latte/65 pt-6 mt-8 space-y-4">
+                <div ref={checkoutRef} className="border-t border-brand-cream-latte/65 pt-6 mt-8 space-y-4">
                   <h4 className="font-serif text-sm font-bold text-neutral-900 border-b border-brand-cream-latte pb-1.5">
                     Shipping & Payment Contact
                   </h4>
@@ -309,6 +319,13 @@ _Please send payment details for GPay / PhonePe. I am placing this order directl
                   <span className="font-serif text-lg text-brand-rose-deep">₹{getTotal().toLocaleString('en-IN')}</span>
                 </div>
               </div>
+
+              {/* Validation error near the button so it's always visible */}
+              {validationErr && (
+                <p className="text-[10px] text-brand-rose-deep bg-brand-rose-light/50 border border-brand-rose-blush p-2 rounded-lg font-medium text-center">
+                  ⚠ {validationErr}
+                </p>
+              )}
 
               {/* No COD Notice */}
               <div className="bg-brand-rose-light/45 rounded-xl p-2.5 border border-brand-rose-blush/40 text-[9px] text-brand-rose-deep flex gap-2 items-start leading-snug">

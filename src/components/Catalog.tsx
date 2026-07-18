@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useStore, type Product } from '../context/StoreContext';
-import { Search, SlidersHorizontal, ShoppingBag, Eye, X, Check, Info, Sparkles } from 'lucide-react';
+import { Search, SlidersHorizontal, ShoppingBag, Eye, X, Check, Info, Sparkles, Send } from 'lucide-react';
 
 export const Catalog: React.FC = () => {
-  const { products, addToCart } = useStore();
+  const { products, addToCart, settings, addOrder } = useStore();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedVariety, setSelectedVariety] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -18,6 +18,15 @@ export const Catalog: React.FC = () => {
   const [customSize, setCustomSize] = useState('Standard');
   const [quantity, setQuantity] = useState(1);
   const [successMsg, setSuccessMsg] = useState(false);
+
+  // Direct Booking States
+  const [isDirectBooking, setIsDirectBooking] = useState(false);
+  const [bookName, setBookName] = useState('');
+  const [bookPhone, setBookPhone] = useState('');
+  const [bookAddress, setBookAddress] = useState('');
+  const [bookPincode, setBookPincode] = useState('');
+  const [bookSuccess, setBookSuccess] = useState(false);
+  const [validationErr, setValidationErr] = useState('');
 
   const categories = [
     'All',
@@ -82,6 +91,90 @@ export const Catalog: React.FC = () => {
     setCustomSize('Standard');
     setQuantity(1);
     setSuccessMsg(false);
+
+    setIsDirectBooking(false);
+    setBookName('');
+    setBookPhone('');
+    setBookAddress('');
+    setBookPincode('');
+    setBookSuccess(false);
+    setValidationErr('');
+  };
+
+  const handleDirectBook = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bookName || !bookPhone || !bookAddress || !bookPincode) {
+      setValidationErr('Please fill in all the shipping and contact details.');
+      return;
+    }
+    setValidationErr('');
+    setBookSuccess(true);
+
+    const price = calculateCustomizedPrice();
+    const itemTotal = price * quantity;
+    const grandTotal = itemTotal + settings.shippingFee;
+
+    const parts = [
+      `Size: ${customSize}`,
+      `Colors: ${customPrimaryColor}/${customSecondaryColor}`,
+      addFairyLights ? 'Fairy Lights (+₹100)' : '',
+      addPearls ? 'Pearl Beads (+₹50)' : '',
+      customNote ? `Note: "${customNote}"` : ''
+    ].filter(Boolean);
+
+    const createdOrder = addOrder({
+      customerName: bookName,
+      customerPhone: bookPhone,
+      shippingAddress: bookAddress,
+      pincode: bookPincode,
+      items: [
+        {
+          name: activeProduct!.name,
+          quantity: quantity,
+          price: price,
+          customizations: parts.join(' | ')
+        }
+      ],
+      total: grandTotal
+    });
+
+    const orderText = `*1. ${activeProduct!.name}* x ${quantity} (₹${price.toLocaleString('en-IN')}/ea)
+   - Size: ${customSize}
+   - Colors: ${customPrimaryColor}/${customSecondaryColor}
+   ${addFairyLights ? '- ✓ Fairy Lights (Included)\n   ' : ''}${addPearls ? '- ✓ Pearl Beads (Included)\n   ' : ''}${customNote ? `- Msg Note: "${customNote}"\n   ` : ''}`;
+
+    const message = `🌸 *Amra's Studio - New Direct Booking (${createdOrder.id})* 🌸
+
+*Customer Details:*
+- *Name:* ${bookName}
+- *Phone:* ${bookPhone}
+- *Shipping Address:* ${bookAddress}, Goa/India
+- *Pincode:* ${bookPincode}
+
+*Order Items:*
+${orderText}
+*Billing Summary:*
+- *Subtotal:* ₹${itemTotal.toLocaleString('en-IN')}
+- *Flat Shipping:* ₹${settings.shippingFee.toLocaleString('en-IN')}
+- *Grand Total:* ₹${grandTotal.toLocaleString('en-IN')}
+
+_Please send payment details for GPay / PhonePe. I am placing this booking directly via the web portal._`;
+
+    const encodedText = encodeURIComponent(message);
+    const targetWaUrl = `https://wa.me/${settings.whatsAppNumber.replace(/[^0-9]/g, '')}?text=${encodedText}`;
+
+    setTimeout(() => {
+      // Open WhatsApp tab
+      window.open(targetWaUrl, '_blank');
+      // Reset states
+      setBookSuccess(false);
+      setIsDirectBooking(false);
+      setActiveProduct(null);
+      setBookName('');
+      setBookPhone('');
+      setBookAddress('');
+      setBookPincode('');
+    }, 1200);
   };
 
   const calculateCustomizedPrice = () => {
@@ -411,56 +504,154 @@ export const Catalog: React.FC = () => {
                     />
                   </div>
 
-                  {/* Quantity & Add to Cart button */}
+                  {/* Quantity & Booking / Add to Cart options */}
                   <div className="border-t border-brand-cream-latte pt-4 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-neutral-500">Total Price:</span>
-                      <span className="font-serif text-2xl font-bold text-brand-rose-deep">
-                        ₹{(calculateCustomizedPrice() * quantity).toLocaleString('en-IN')}
-                      </span>
-                    </div>
+                    {!isDirectBooking ? (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-neutral-500">Total Price:</span>
+                          <span className="font-serif text-2xl font-bold text-brand-rose-deep">
+                            ₹{(calculateCustomizedPrice() * quantity).toLocaleString('en-IN')}
+                          </span>
+                        </div>
 
-                    <div className="flex gap-3">
-                      {/* Quantity Controller */}
-                      <div className="flex items-center border border-brand-cream-latte rounded-xl overflow-hidden bg-brand-cream">
-                        <button
-                          onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                          className="px-3.5 py-2 text-neutral-600 hover:bg-brand-cream-honey/40 transition-colors"
-                        >
-                          -
-                        </button>
-                        <span className="px-3 font-semibold text-xs text-neutral-800">{quantity}</span>
-                        <button
-                          onClick={() => setQuantity(quantity + 1)}
-                          className="px-3.5 py-2 text-neutral-600 hover:bg-brand-cream-honey/40 transition-colors"
-                        >
-                          +
-                        </button>
-                      </div>
+                        <div className="flex flex-col gap-2.5">
+                          <div className="flex gap-3">
+                            {/* Quantity Controller */}
+                            <div className="flex items-center border border-brand-cream-latte rounded-xl overflow-hidden bg-brand-cream">
+                              <button
+                                type="button"
+                                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                className="px-3.5 py-2 text-neutral-600 hover:bg-brand-cream-honey/40 transition-colors"
+                              >
+                                -
+                              </button>
+                              <span className="px-3 font-semibold text-xs text-neutral-800">{quantity}</span>
+                              <button
+                                type="button"
+                                onClick={() => setQuantity(quantity + 1)}
+                                className="px-3.5 py-2 text-neutral-600 hover:bg-brand-cream-honey/40 transition-colors"
+                              >
+                                +
+                              </button>
+                            </div>
 
-                      {/* Add Button */}
-                      <button
-                        onClick={handleAddToCart}
-                        disabled={successMsg}
-                        className={`flex-1 rounded-xl py-3.5 text-xs font-bold text-brand-cream flex items-center justify-center gap-2 shadow-lg transition-all duration-300 hover:shadow-xl ${
-                          successMsg
-                            ? 'bg-brand-green-olive shadow-none'
-                            : 'bg-brand-rose-deep hover:bg-brand-rose-mid hover:-translate-y-0.5'
-                        }`}
-                      >
-                        {successMsg ? (
-                          <>
-                            <Check className="h-4.5 w-4.5" />
-                            Added to Basket!
-                          </>
-                        ) : (
-                          <>
-                            <ShoppingBag className="h-4.5 w-4.5" />
-                            Add to Basket
-                          </>
+                            {/* Add Button */}
+                            <button
+                              type="button"
+                              onClick={handleAddToCart}
+                              disabled={successMsg}
+                              className={`flex-grow rounded-xl py-3 text-xs font-bold text-brand-cream flex items-center justify-center gap-2 shadow-sm transition-all ${
+                                successMsg
+                                  ? 'bg-brand-green-olive shadow-none'
+                                  : 'bg-brand-rose-mid/10 text-brand-rose-deep hover:bg-brand-rose-mid/20'
+                              }`}
+                            >
+                              {successMsg ? (
+                                <>
+                                  <Check className="h-4.5 w-4.5" />
+                                  Added to Basket!
+                                </>
+                              ) : (
+                                <>
+                                  <ShoppingBag className="h-4.5 w-4.5" />
+                                  Add to Basket
+                                </>
+                              )}
+                            </button>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => setIsDirectBooking(true)}
+                            className="w-full rounded-xl bg-brand-rose-deep py-3 text-xs font-bold text-brand-cream hover:bg-brand-rose-mid transition-all shadow-md flex items-center justify-center gap-1.5"
+                          >
+                            <Sparkles className="h-4 w-4" />
+                            Book Instantly via WhatsApp
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <form onSubmit={handleDirectBook} className="space-y-3">
+                        <div className="bg-brand-cream-honey/15 rounded-2xl p-4 border border-brand-cream-latte/50 space-y-3">
+                          <p className="text-[10px] font-bold text-brand-green-olive uppercase tracking-wider">Direct Checkout Info</p>
+                          
+                          {validationErr && (
+                            <p className="text-[10px] text-brand-rose-deep font-semibold bg-brand-rose-light/40 border border-brand-rose-blush p-2 rounded-lg">
+                              {validationErr}
+                            </p>
+                          )}
+
+                          {bookSuccess && (
+                            <div className="bg-brand-green-sage/15 border border-brand-green-sage text-brand-green-olive rounded-xl p-3 text-xs flex items-center gap-1.5">
+                              <Check className="h-4 w-4" />
+                              <span>Redirecting to WhatsApp to submit booking...</span>
+                            </div>
+                          )}
+
+                          {!bookSuccess && (
+                            <>
+                              <div className="grid grid-cols-1 gap-2.5">
+                                <input
+                                  type="text"
+                                  value={bookName}
+                                  onChange={(e) => setBookName(e.target.value)}
+                                  required
+                                  placeholder="Full Name"
+                                  className="w-full rounded-xl border border-brand-cream-latte bg-brand-cream px-3 py-2.5 text-xs outline-none"
+                                />
+                                <input
+                                  type="tel"
+                                  value={bookPhone}
+                                  onChange={(e) => setBookPhone(e.target.value)}
+                                  required
+                                  placeholder="WhatsApp Phone Number"
+                                  className="w-full rounded-xl border border-brand-cream-latte bg-brand-cream px-3 py-2.5 text-xs outline-none"
+                                />
+                              </div>
+
+                              <div className="grid grid-cols-3 gap-2">
+                                <input
+                                  type="text"
+                                  value={bookAddress}
+                                  onChange={(e) => setBookAddress(e.target.value)}
+                                  required
+                                  placeholder="Goa Address"
+                                  className="col-span-2 w-full rounded-xl border border-brand-cream-latte bg-brand-cream px-3 py-2.5 text-xs outline-none"
+                                />
+                                <input
+                                  type="text"
+                                  value={bookPincode}
+                                  onChange={(e) => setBookPincode(e.target.value)}
+                                  required
+                                  placeholder="Pincode"
+                                  className="w-full rounded-xl border border-brand-cream-latte bg-brand-cream px-3 py-2.5 text-xs outline-none"
+                                />
+                              </div>
+                            </>
+                          )}
+                        </div>
+
+                        {!bookSuccess && (
+                          <div className="flex gap-2 pt-2">
+                            <button
+                              type="button"
+                              onClick={() => setIsDirectBooking(false)}
+                              className="w-1/3 rounded-xl border border-brand-cream-latte py-2.5 text-xs font-semibold text-neutral-600 hover:text-neutral-800"
+                            >
+                              Back
+                            </button>
+                            <button
+                              type="submit"
+                              className="flex-grow rounded-xl bg-brand-rose-deep py-2.5 text-xs font-bold text-brand-cream hover:bg-brand-rose-mid shadow-md flex items-center justify-center gap-1"
+                            >
+                              <Send className="h-3.5 w-3.5" />
+                              Book (₹{((calculateCustomizedPrice() * quantity) + settings.shippingFee).toLocaleString('en-IN')})
+                            </button>
+                          </div>
                         )}
-                      </button>
-                    </div>
+                      </form>
+                    )}
                   </div>
 
                 </div>

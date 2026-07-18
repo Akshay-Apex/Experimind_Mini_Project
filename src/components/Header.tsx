@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Logo } from './Logo';
-import { ShoppingBag, Menu, X, Wand2, BookOpen, HelpCircle, Flower } from 'lucide-react';
+import { ShoppingBag, Menu, X, Wand2, BookOpen, HelpCircle, Flower, Image } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 
 interface HeaderProps {
@@ -18,6 +18,7 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, setCurrentTab, openC
   const navItems = [
     { id: 'home', label: 'Home', icon: Flower },
     { id: 'catalog', label: 'Catalog', icon: Flower },
+    { id: 'gallery', label: 'Gallery', icon: Image },
     { id: 'customizer', label: 'Bespoke Customizer', icon: Wand2 },
     { id: 'about', label: 'Our Story', icon: BookOpen },
     { id: 'faq', label: 'FAQs', icon: HelpCircle },

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStore, type Product } from '../context/StoreContext';
-import { Edit, Trash2, Plus, LogOut, Check, X, ShieldAlert, ShoppingBag, Settings, LayoutGrid } from 'lucide-react';
+import { GALLERY_IMAGES } from '../assets/gallery';
+import { Edit, Trash2, Plus, LogOut, Check, X, ShieldAlert, ShoppingBag, Settings, LayoutGrid, Eye, EyeOff } from 'lucide-react';
 
 interface AdminDashboardProps {
   onBackToStore: () => void;
@@ -20,8 +21,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
 
   const [activeTab, setActiveTab] = useState<'orders' | 'inventory' | 'settings'>('orders');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [email, setEmail] = useState('amrasstudio.co@gmail.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
 
   // Editing Product form states
@@ -112,64 +114,88 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-brand-cream flex items-center justify-center p-4">
+      <div className="min-h-screen bg-brand-cream flex items-center justify-center p-4 relative">
+        {/* Subtle background decoration */}
+        <div className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-brand-rose-light/20 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-0 translate-x-1/3 translate-y-1/3 w-[500px] h-[500px] rounded-full bg-brand-green-sage/10 blur-3xl pointer-events-none" />
+
         <div className="absolute top-4 left-4">
           <button
             onClick={onBackToStore}
-            className="text-xs font-semibold text-neutral-600 hover:text-brand-rose-deep border border-brand-cream-latte rounded-full px-4 py-2 hover:bg-brand-cream-honey/15"
+            className="text-xs font-semibold text-neutral-600 hover:text-brand-rose-deep border border-brand-cream-latte rounded-full px-4 py-2 hover:bg-brand-cream-honey/15 transition-all"
           >
             ← Back to Store
           </button>
         </div>
 
-        <div className="w-full max-w-md bg-brand-cream border border-brand-cream-latte p-8 rounded-[2rem] shadow-xl text-center space-y-6">
-          <div className="inline-flex rounded-full bg-brand-rose-light p-3 text-brand-rose-deep">
+        <div className="w-full max-w-md bg-brand-cream border border-brand-cream-latte p-8 rounded-[2rem] shadow-2xl text-center space-y-6 relative z-10">
+          {/* Icon Badge */}
+          <div className="inline-flex rounded-full bg-brand-rose-light p-4 text-brand-rose-deep shadow-inner">
             <ShieldAlert className="h-8 w-8" />
           </div>
-          <div>
+
+          <div className="space-y-1">
             <h2 className="font-serif text-2xl font-bold text-neutral-900">Merchant Gateway</h2>
-            <p className="text-xs text-neutral-500 mt-1.5">Authorized Store Manager Entry Only</p>
+            <p className="text-xs text-neutral-500">Authorized store manager access only.</p>
           </div>
 
           {loginError && (
-            <div className="bg-brand-rose-light/50 border border-brand-rose-blush text-brand-rose-deep text-xs p-3 rounded-xl">
+            <div className="bg-brand-rose-light/50 border border-brand-rose-blush text-brand-rose-deep text-xs p-3 rounded-xl text-left flex items-center gap-2">
+              <X className="h-4 w-4 shrink-0" />
               {loginError}
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-4 text-left">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Email Address</label>
+              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500" htmlFor="admin-email">Email Address</label>
               <input
+                id="admin-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="mt-1 w-full rounded-xl border border-brand-cream-latte bg-brand-cream px-3.5 py-2.5 text-xs outline-none focus:ring-1 focus:ring-brand-rose-mid"
+                autoComplete="email"
+                placeholder="Enter your admin email"
+                className="mt-1.5 w-full rounded-xl border border-brand-cream-latte bg-brand-cream px-3.5 py-2.5 text-xs outline-none focus:ring-1 focus:ring-brand-rose-mid transition-all"
               />
             </div>
+
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 flex justify-between">
-                <span>Secret Key</span>
-                <span className="text-brand-rose-mid lowercase font-normal italic">Hint: Amra2025!</span>
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                placeholder="••••••••"
-                className="mt-1 w-full rounded-xl border border-brand-cream-latte bg-brand-cream px-3.5 py-2.5 text-xs outline-none focus:ring-1 focus:ring-brand-rose-mid"
-              />
+              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500" htmlFor="admin-password">Password</label>
+              <div className="relative mt-1.5">
+                <input
+                  id="admin-password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  className="w-full rounded-xl border border-brand-cream-latte bg-brand-cream px-3.5 py-2.5 pr-10 text-xs outline-none focus:ring-1 focus:ring-brand-rose-mid transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-brand-rose-deep transition-colors"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             <button
               type="submit"
-              className="w-full mt-2 rounded-xl bg-brand-rose-deep py-3 text-xs font-bold text-brand-cream hover:bg-brand-rose-mid transition-all shadow-md"
+              className="w-full mt-2 rounded-xl bg-brand-rose-deep py-3 text-xs font-bold text-brand-cream hover:bg-brand-rose-mid transition-all shadow-md hover:-translate-y-0.5"
             >
               Sign In to Control Panel
             </button>
           </form>
+
+          <p className="text-[10px] text-neutral-400">
+            Access restricted to Amra's Studio management only.
+          </p>
         </div>
       </div>
     );
@@ -415,15 +441,31 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
                     </div>
 
                     <div>
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 font-sans">Product Image URL</label>
-                      <input
-                        type="url"
-                        value={newProdImage}
-                        onChange={(e) => setNewProdImage(e.target.value)}
-                        required
-                        placeholder="https://images.unsplash.com/photo-..."
-                        className="mt-1 w-full rounded-xl border border-brand-cream-latte bg-brand-cream px-3.5 py-2 text-xs outline-none"
-                      />
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-2">Select Design Image</label>
+                      <div className="grid grid-cols-5 md:grid-cols-7 gap-2 max-h-36 overflow-y-auto border border-brand-cream-latte rounded-xl p-2.5 bg-brand-cream">
+                        {GALLERY_IMAGES.map((imgUrl, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            onClick={() => setNewProdImage(imgUrl)}
+                            className={`cursor-pointer aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                              newProdImage === imgUrl ? 'border-brand-rose-deep scale-95 ring-1 ring-brand-rose-deep' : 'border-transparent opacity-60 hover:opacity-100'
+                            }`}
+                          >
+                            <img src={imgUrl} className="w-full h-full object-cover" alt="Local design asset" />
+                          </button>
+                        ))}
+                      </div>
+                      <div className="mt-2.5">
+                        <label className="text-[9px] font-bold uppercase tracking-wider text-neutral-400">Or Paste Image URL</label>
+                        <input
+                          type="text"
+                          value={newProdImage}
+                          onChange={(e) => setNewProdImage(e.target.value)}
+                          placeholder="e.g. Custom image URL"
+                          className="mt-1 w-full rounded-xl border border-brand-cream-latte bg-brand-cream px-3.5 py-2 text-xs outline-none"
+                        />
+                      </div>
                     </div>
 
                     <div>
@@ -507,14 +549,31 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToStore })
                     </div>
 
                     <div>
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Product Image URL</label>
-                      <input
-                        type="url"
-                        value={editingProduct.image}
-                        onChange={(e) => setEditingProduct({ ...editingProduct, image: e.target.value })}
-                        required
-                        className="mt-1 w-full rounded-xl border border-brand-cream-latte bg-brand-cream px-3.5 py-2 text-xs outline-none"
-                      />
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-2">Select Design Image</label>
+                      <div className="grid grid-cols-5 md:grid-cols-7 gap-2 max-h-36 overflow-y-auto border border-brand-cream-latte rounded-xl p-2.5 bg-brand-cream">
+                        {GALLERY_IMAGES.map((imgUrl, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            onClick={() => setEditingProduct({ ...editingProduct, image: imgUrl })}
+                            className={`cursor-pointer aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                              editingProduct.image === imgUrl ? 'border-brand-rose-deep scale-95 ring-1 ring-brand-rose-deep' : 'border-transparent opacity-60 hover:opacity-100'
+                            }`}
+                          >
+                            <img src={imgUrl} className="w-full h-full object-cover" alt="Local design asset" />
+                          </button>
+                        ))}
+                      </div>
+                      <div className="mt-2.5">
+                        <label className="text-[9px] font-bold uppercase tracking-wider text-neutral-400">Or Paste Image URL</label>
+                        <input
+                          type="text"
+                          value={editingProduct.image}
+                          onChange={(e) => setEditingProduct({ ...editingProduct, image: e.target.value })}
+                          placeholder="e.g. Custom image URL"
+                          className="mt-1 w-full rounded-xl border border-brand-cream-latte bg-brand-cream px-3.5 py-2 text-xs outline-none"
+                        />
+                      </div>
                     </div>
 
                     <div>

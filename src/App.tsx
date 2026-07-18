@@ -9,6 +9,7 @@ import { AboutUs } from './components/AboutUs';
 import { FAQ } from './components/FAQ';
 import { CartDrawer } from './components/CartDrawer';
 import { AdminDashboard } from './pages/AdminDashboard';
+import { Gallery } from './components/Gallery';
 import { ArrowRight, Sparkles } from 'lucide-react';
 
 function AppContent() {
@@ -99,6 +100,8 @@ function AppContent() {
         )}
 
         {currentTab === 'catalog' && <Catalog />}
+        
+        {currentTab === 'gallery' && <Gallery />}
         
         {currentTab === 'customizer' && <Customizer />}
         

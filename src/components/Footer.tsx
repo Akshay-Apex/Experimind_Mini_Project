@@ -81,7 +81,7 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentTab, onAdminTrigger })
               Quick Navigation
             </h4>
             <ul className="space-y-2.5 text-sm">
-              {['home', 'catalog', 'customizer', 'about', 'faq'].map((tab) => (
+              {['home', 'catalog', 'gallery', 'customizer', 'about', 'faq'].map((tab) => (
                 <li key={tab}>
                   <button
                     onClick={() => handleQuickLink(tab)}
